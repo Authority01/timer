@@ -1,0 +1,211 @@
+A51 MACRO ASSEMBLER  TASK2                                                                06/11/2017 16:05:03 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02
+OBJECT MODULE PLACED IN task2.OBJ
+ASSEMBLER INVOKED BY: C:\Keil\C51\BIN\A51.EXE task2.asm SET(SMALL) DEBUG EP
+
+LOC  OBJ            LINE     SOURCE
+
+  0084                 1     SCK             BIT     P0.4;
+  0085                 2     RCK             BIT     P0.5;
+  0086                 3     RST             BIT     P0.6;
+  0087                 4     DAT             BIT     P0.7;
+  0001                 5     MODE            EQU             01H
+  0028                 6     TIMES           EQU             40
+  0021                 7     MINH            EQU             21H
+  0022                 8     MINL            EQU             22H
+  0023                 9     SECH            EQU             23H
+  0024                10     SECL            EQU             24H
+                      11     
+0000                  12                             ORG             0
+0000 0115             13                             AJMP    START
+0003                  14                             ORG             03H
+0003 014A             15                             AJMP    RESET
+000B                  16                             ORG             0BH
+000B 0159             17                             AJMP    TIMER0
+0013                  18                             ORG             13H              ;设置中断向量INT1
+0013 0147             19                             AJMP    START_OR_STOP           
+0015 758000           20     START:          MOV     P0, #00H
+0018 9000E5           21                             MOV             DPTR,#TAB
+001B 752100           22                             MOV             MINH,#0
+001E 752200           23                             MOV             MINL,#0
+0021 752300           24                             MOV             SECH,#0
+0024 752400           25                             MOV             SECL,#0
+0027 D2AF             26                             SETB    EA               ;打开中断总开关
+0029 D2A8             27                             SETB    EX0              ;打开中断INT0的开关
+002B D2AA             28                             SETB    EX1              ;打开中断INT1的开关
+002D D2A9             29                             SETB    ET0              ;打开计时器TIMER1中断的开关               
+                                  
+002F D288             30                             SETB    IT0              ;INT0采用下降沿触发
+0031 D28A             31                             SETB    IT1              ;INT1采用下降沿触发
+0033 758901           32                             MOV             TMOD,#MODE      ;设置定时器模式
+0036 D28C             33                             SETB    TR0
+0038 758CC3           34                             MOV             TH0,#0C3H       ;65536-50000 = C350H
+003B 758A50           35                             MOV             TL0,#50H
+003E 7B28             36                             MOV             R3,#TIMES
+0040 758130           37                             MOV             SP,#30H         ;移开堆栈指针避免冲突
+0043                  38     MAINLOOP:       
+0043 1168             39                             ACALL   DISPLAY                                 
+0045 0143             40                             AJMP    MAINLOOP
+                      41     
+0047                  42     START_OR_STOP:          
+0047 B28C             43                             CPL             TR0
+0049 32               44                             RETI
+                      45     
+004A 752100           46     RESET:          MOV             MINH,#0
+004D 752200           47                             MOV             MINL,#0
+0050 752300           48                             MOV             SECH,#0
+0053 752400           49                             MOV             SECL,#0
+0056 C28C             50                             CLR             TR0
+0058 32               51                             RETI
+                      52     
+0059 DB04             53     TIMER0:         DJNZ    R3,AGAIN
+005B 1195             54                             ACALL   INCREASE
+005D 7B28             55                             MOV             R3,#TIMES
+005F 758CC3           56     AGAIN:          MOV             TH0,#0C3H
+0062 758A50           57                             MOV             TL0,#50H
+A51 MACRO ASSEMBLER  TASK2                                                                06/11/2017 16:05:03 PAGE     2
+
+0065 D28C             58                             SETB    TR0
+0067 32               59                             RETI
+                      60     
+                      61                                                             
+0068 758001           62     DISPLAY:        MOV             P0,#01H
+006B E521             63                             MOV             A,MINH
+006D 93               64                             MOVC    A,@A+DPTR
+006E F8               65                             MOV             R0,A
+006F 11C7             66                             ACALL   SHOW_NUM
+0071 11BE             67                             ACALL   DELAY
+                      68     
+0073 758002           69                             MOV             P0,#02H
+0076 E522             70                             MOV             A,MINL
+0078 93               71                             MOVC    A,@A+DPTR
+0079 F8               72                             MOV             R0,A
+007A 11C7             73                             ACALL   SHOW_NUM
+007C 11BE             74                             ACALL   DELAY
+                      75     
+007E 758004           76                             MOV             P0,#04H
+0081 E523             77                             MOV             A,SECH
+0083 93               78                             MOVC    A,@A+DPTR
+0084 F8               79                             MOV             R0,A
+0085 11C7             80                             ACALL   SHOW_NUM
+0087 11BE             81                             ACALL   DELAY
+                      82     
+0089 758008           83                             MOV             P0,#08H
+008C E524             84                             MOV             A,SECL
+008E 93               85                             MOVC    A,@A+DPTR
+008F F8               86                             MOV             R0,A
+0090 11C7             87                             ACALL   SHOW_NUM
+0092 11BE             88                             ACALL   DELAY
+0094 22               89                             RET                     
+                      90     
+0095 0524             91     INCREASE:       INC             SECL
+0097 740A             92                             MOV             A,#10
+0099 B52421           93                             CJNE    A,SECL,INC_EXIT
+009C 752400           94                             MOV             SECL,#0
+                      95     
+009F 0523             96                             INC             SECH
+00A1 7406             97                             MOV             A,#6
+00A3 B52317           98                             CJNE    A,SECH,INC_EXIT
+00A6 752300           99                             MOV             SECH,#0
+                     100     
+00A9 0522            101                             INC             MINL
+00AB 740A            102                             MOV             A,#10
+00AD B5220D          103                             CJNE    A,MINL,INC_EXIT
+00B0 752200          104                             MOV             MINL,#0
+                     105     
+00B3 0521            106                             INC             MINH
+00B5 7406            107                             MOV             A,#6
+00B7 B52103          108                             CJNE    A,MINH,INC_EXIT
+00BA 752100          109                             MOV             MINH,#0                 
+00BD 22              110     INC_EXIT:       RET
+                     111                             
+                     112     
+00BE 7FC8            113     DELAY:          MOV     R7, #200                ;约2ms   
+00C0 7E0A            114     DL1:            MOV     R6, #10
+00C2 DEFE            115                             DJNZ    R6, $           
+00C4 DFFA            116                             DJNZ    R7, DL1
+00C6 22              117                     RET
+                     118     
+                     119                                     
+                     120              ;INPUT PARAMETER:R0
+00C7 7908            121     SHOW_NUM:       MOV     R1, #8H;
+00C9 7401            122                             MOV     A, #00000001B           
+00CB FA              123                             MOV     R2,A             
+A51 MACRO ASSEMBLER  TASK2                                                                06/11/2017 16:05:03 PAGE     3
+
+00CC 58              124     SHIFT:          ANL     A,R0                    ;pick out one bit,from right to left
+00CD 7011            125                             JNZ     SET_DAT
+00CF C287            126                             CLR     DAT
+00D1 D284            127     SET_SCK:        SETB    SCK
+00D3 C284            128                             CLR     SCK      
+00D5 EA              129                             MOV     A,R2
+00D6 23              130                             RL              A
+00D7 FA              131                             MOV     R2,A
+00D8 D9F2            132                             DJNZ    R1,SHIFT                         
+00DA D285            133                             SETB    RCK
+00DC C285            134                             CLR     RCK
+00DE 01E4            135                             AJMP    SHOW_EXIT
+00E0 D287            136     SET_DAT:        SETB    DAT     
+00E2 01D1            137                             AJMP    SET_SCK
+00E4 22              138     SHOW_EXIT:      RET
+                     139     
+00E5 FC60DAF2        140     TAB:            DB              0fcH,60H,0daH,0f2H,66H,0b6H,0beH,0e0H,0feH,0f6H         
+00E9 66B6BEE0                
+00ED FEF6                    
+                     141                             
+                     142                             END
+A51 MACRO ASSEMBLER  TASK2                                                                06/11/2017 16:05:03 PAGE     4
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+AGAIN. . . . . . .  C ADDR   005FH   A   
+DAT. . . . . . . .  B ADDR   0080H.7 A   
+DELAY. . . . . . .  C ADDR   00BEH   A   
+DISPLAY. . . . . .  C ADDR   0068H   A   
+DL1. . . . . . . .  C ADDR   00C0H   A   
+EA . . . . . . . .  B ADDR   00A8H.7 A   
+ET0. . . . . . . .  B ADDR   00A8H.1 A   
+EX0. . . . . . . .  B ADDR   00A8H.0 A   
+EX1. . . . . . . .  B ADDR   00A8H.2 A   
+INCREASE . . . . .  C ADDR   0095H   A   
+INC_EXIT . . . . .  C ADDR   00BDH   A   
+IT0. . . . . . . .  B ADDR   0088H.0 A   
+IT1. . . . . . . .  B ADDR   0088H.2 A   
+MAINLOOP . . . . .  C ADDR   0043H   A   
+MINH . . . . . . .  N NUMB   0021H   A   
+MINL . . . . . . .  N NUMB   0022H   A   
+MODE . . . . . . .  N NUMB   0001H   A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+RCK. . . . . . . .  B ADDR   0080H.5 A   
+RESET. . . . . . .  C ADDR   004AH   A   
+RST. . . . . . . .  B ADDR   0080H.6 A   
+SCK. . . . . . . .  B ADDR   0080H.4 A   
+SECH . . . . . . .  N NUMB   0023H   A   
+SECL . . . . . . .  N NUMB   0024H   A   
+SET_DAT. . . . . .  C ADDR   00E0H   A   
+SET_SCK. . . . . .  C ADDR   00D1H   A   
+SHIFT. . . . . . .  C ADDR   00CCH   A   
+SHOW_EXIT. . . . .  C ADDR   00E4H   A   
+SHOW_NUM . . . . .  C ADDR   00C7H   A   
+SP . . . . . . . .  D ADDR   0081H   A   
+START. . . . . . .  C ADDR   0015H   A   
+START_OR_STOP. . .  C ADDR   0047H   A   
+TAB. . . . . . . .  C ADDR   00E5H   A   
+TH0. . . . . . . .  D ADDR   008CH   A   
+TIMER0 . . . . . .  C ADDR   0059H   A   
+TIMES. . . . . . .  N NUMB   0028H   A   
+TL0. . . . . . . .  D ADDR   008AH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR0. . . . . . . .  B ADDR   0088H.4 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)
