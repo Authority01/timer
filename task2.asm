@@ -139,7 +139,7 @@ RESET_EXIT:	CLR		TR1			 ;关闭TIMER1，停止闪烁
 
 ;=================================================
 ;INT1中断函数START_OR_STOP
-;功能：暂停和继续倒计时
+;功能：暂停和继续倒计时，也可用来关闭蜂鸣器
 ;=================================================
 START_OR_STOP:
 			CLR		EX1
@@ -178,23 +178,11 @@ TIMER1_AGAIN:MOV	TH1,#0B1H
 			RETI
 
 
-
-;=================================================
-;TWINKLE
-;功能：通过判断闪烁标志实现数码管闪烁
-;=================================================
-TWINKLE:	JB		NOT_TWINKLE,TWINKLE_NEXT
-			MOV		P0, #0		  ;数码管不显示
-			AJMP	TWINKLE_EXIT
-TWINKLE_NEXT:ACALL	DISPLAY		  ;数码管显示			
-TWINKLE_EXIT:RET
-
-
 ;=================================================
 ;DISPLAY
 ;功能：数码管显示
 ;=================================================							
-DISPLAY:	JB		STOP_1,DISP_NEXT1
+DISPLAY:	JB		STOP_1,DISP_NEXT1;若该数码管显示开关被关闭，则跳过
 			MOV		P0,#01H		 ;开启第一个数码管
 			MOV		A,MINH
 			MOVC	A,@A+DPTR	 ;查表获得所要显示数字的编码
@@ -230,7 +218,7 @@ DISP_EXIT:	RET
 ;=================================================
 ;DECREASE
 ;功能：倒计时减少1秒
-;	   如果倒计时完成保持00：00,蜂鸣器发声	 
+;	   如果倒计时完成保持00：00,蜂鸣器发声,可通过INT1关闭	 
 ;=================================================
 DECREASE:	DEC		SECL
 			MOV		A,#0FFH
@@ -256,7 +244,6 @@ DECREASE:	DEC		SECL
 			MOV		MINL,#0
 			MOV		SECH,#0
 			MOV		SECL,#0
-;			CLR		EX1		   ;倒计时已完成，故关闭INT1的倒计时暂停功能
 			CLR		P1.3	   ;蜂鸣器发声			
 			ACALL	SCAN_DELAY	  
 			SETB	P1.3	   ;蜂鸣器关闭
