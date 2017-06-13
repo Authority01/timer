@@ -1,4 +1,4 @@
-A51 MACRO ASSEMBLER  TASK2                                                                06/12/2017 17:15:00 PAGE     1
+A51 MACRO ASSEMBLER  TASK2                                                                06/13/2017 12:46:01 PAGE     1
 
 
 MACRO ASSEMBLER A51 V8.02
@@ -7,289 +7,400 @@ ASSEMBLER INVOKED BY: C:\Keil\C51\BIN\A51.EXE task2.asm SET(SMALL) DEBUG EP
 
 LOC  OBJ            LINE     SOURCE
 
-  0084                 1     SCK             BIT     P0.4;
-  0085                 2     RCK             BIT     P0.5;
-  0086                 3     RST             BIT     P0.6;
-  0087                 4     DAT             BIT     P0.7;
-  0001                 5     MODE            EQU             01H
-  000A                 6     TIMES           EQU             10
-  0000                 7     NOT_TWINKLE     BIT             20H.0           
-  0021                 8     MINH            EQU             21H
-  0022                 9     MINL            EQU             22H
-  0023                10     SECH            EQU             23H
-  0024                11     SECL            EQU             24H
-  0025                12     COUNT           EQU             25H
-                      13     
-0000                  14                             ORG             0
-0000 011D             15                             AJMP    START
-0003                  16                             ORG             03H
-0003 0165             17                             AJMP    RESET
-000B                  18                             ORG             0BH
-000B 01BD             19                             AJMP    TIMER0
-0013                  20                             ORG             13H              ;ÉèÖÃÖÐ¶ÏÏòÁ¿INT1
-0013 0159             21                             AJMP    START_OR_STOP
-001B                  22                             ORG             1BH
-001B 01CC             23                             AJMP    TIMER1          
-001D 758000           24     START:          MOV     P0, #00H
-0020 9001E6           25                             MOV             DPTR,#TAB
-0023 752100           26                             MOV             MINH,#0
-0026 752200           27                             MOV             MINL,#0
-0029 752300           28                             MOV             SECH,#0
-002C 752400           29                             MOV             SECL,#0
-002F D2AF             30                             SETB    EA               ;´ò¿ªÖÐ¶Ï×Ü¿ª¹Ø
-0031 D2A8             31                             SETB    EX0              ;´ò¿ªÖÐ¶ÏINT0µÄ¿ª¹Ø            
-0033 D2A9             32                             SETB    ET0              ;´ò¿ª¼ÆÊ±Æ÷TIMER0ÖÐ¶ÏµÄ¿ª¹Ø
-0035 D2AB             33                             SETB    ET1              ;´ò¿ª¼ÆÊ±Æ÷TIMER1ÖÐ¶ÏµÄ¿ª¹Ø
-0037 D2BB             34                             SETB    PT1              ;Ìá¸ß¼ÆÊ±Æ÷TIMER1ÖÐ¶ÏµÄÓÅÏÈ¼¶             
-                                  
-0039 D288             35                             SETB    IT0              ;INT0²ÉÓÃÏÂ½µÑØ´¥·¢
-003B D28A             36                             SETB    IT1              ;INT1²ÉÓÃÏÂ½µÑØ´¥·¢
-003D 758901           37                             MOV             TMOD,#MODE      ;ÉèÖÃ¶¨Ê±Æ÷Ä£Ê½
-0040 D200             38                             SETB    NOT_TWINKLE
-0042 758C3C           39                             MOV             TH0,#3CH        ;65536-50000 = 3CB0H
-0045 758AB0           40                             MOV             TL0,#0B0H
-0048 758D3C           41                             MOV             TH1,#3CH        ;65536-25000 = 9E58H
-004B 758BB0           42                             MOV             TL1,#0B0H
-004E 7B0A             43                             MOV             R3,#TIMES
-0050 7D0A             44                             MOV             R5,#TIMES
-0052 758130           45                             MOV             SP,#30H         ;ÒÆ¿ª¶ÑÕ»Ö¸Õë±ÜÃâ³åÍ»
-0055                  46     MAIN_LOOP:      
-0055 11E7             47                             ACALL   DISPLAY                                 
-0057 0155             48                             AJMP    MAIN_LOOP
-                      49     
-0059                  50     START_OR_STOP:
-0059 C2AA             51                             CLR             EX1
-005B 314E             52                             ACALL   DELAY
-005D 208B02           53                             JB              IE1,STOP_EXIT
-0060 B28C             54                             CPL             TR0
-0062 D2AA             55     STOP_EXIT:      SETB    EX1
-0064 32               56                             RETI
-                      57     
-A51 MACRO ASSEMBLER  TASK2                                                                06/12/2017 17:15:00 PAGE     2
+                       1     ;=================================================
+                       2     ;¶¨Òå±äÁ¿
+                       3     ;=================================================
+  0084                 4     SCK             BIT     P0.4
+  0085                 5     RCK             BIT     P0.5
+  0086                 6     RST             BIT     P0.6
+  0087                 7     DAT             BIT     P0.7
+  0011                 8     MODE            EQU             11H              ;¼ÆÊ±Æ÷¹¤×÷Ä£Ê½MODE1
+  000A                 9     TIMES           EQU             10               ;¼ÆÊ±Æ÷Ñ­»·´ÎÊ
+  0000                10     NOT_TWINKLE     BIT             20H.0    ;¿ØÖÆÊÂë¹ÜÊÇ·ñÉÁË¸
+  0001                11     STOP_1          BIT             20H.1   
+  0002                12     STOP_2          BIT             20H.2
+  0003                13     STOP_3          BIT             20H.3
+  0004                14     STOP_4          BIT             20H.4
+  0021                15     MINH            EQU             21H
+  0022                16     MINL            EQU             22H
+  0023                17     SECH            EQU             23H
+  0024                18     SECL            EQU             24H
+  0025                19     COUNT           EQU             25H               ;ÑÓÊ±º¯ÊÑ­»·
+                      20     
+                      21     
+                      22     ;=================================================
+                      23     ;ÉèÖÃÖÐ¶ÏÏòÁ¿
+                      24     ;=================================================
+0000                  25                             ORG             0
+0000 011D             26                             AJMP    START
+0003                  27                             ORG             03H              ;ÉèÖÃÖÐ¶ÏÏòÁ¿INT0
+0003 0159             28                             AJMP    RESET
+000B                  29                             ORG             0BH              ;ÉèÖÃ¶¨Ê±Æ÷TIMER0ÖÐ¶Ï
+000B 01D1             30                             AJMP    TIMER0
+0013                  31                             ORG             13H              ;ÉèÖÃÖÐ¶ÏÏòÁ¿INT1
+0013 01C5             32                             AJMP    START_OR_STOP
+001B                  33                             ORG             1BH              ;ÉèÖÃ¶¨Ê±Æ÷TIMER1ÖÐ¶Ï
+001B 01E0             34                             AJMP    TIMER1
+                      35                             
+                      36                             
+                      37     ;=================================================
+                      38     ;Ö÷º¯Ê£ºSTART
+                      39     ;¹¦ÄÜ£º³õÊ¼»¯ºÍ±£³ÖÊÂë¹ÜÏÔÊ¾
+                      40     ;=================================================                                      
+001D 758000           41     START:          MOV     P0, #00H 
+0020 900201           42                             MOV             DPTR,#TAB;½«±íµÄÊ×µØÖ·¸³Öµ¸øDPTR
+0023 752100           43                             MOV             MINH,#0  ;µ¹¼ÆÊ±Æ÷³õÊ¼»¯
+0026 752200           44                             MOV             MINL,#0
+0029 752300           45                             MOV             SECH,#0
+002C 752400           46                             MOV             SECL,#0
+002F D2AF             47                             SETB    EA               ;´ò¿ªÖÐ¶Ï×Ü¿ª¹Ø
+0031 D2A8             48                             SETB    EX0              ;´ò¿ªÖÐ¶ÏINT0µÄ¿ª¹Ø            
+0033 D2A9             49                             SETB    ET0              ;´ò¿ª¼ÆÊ±Æ÷TIMER0ÖÐ¶ÏµÄ¿ª¹Ø
+0035 D2AB             50                             SETB    ET1              ;´ò¿ª¼ÆÊ±Æ÷TIMER1ÖÐ¶ÏµÄ¿ª¹Ø
+0037 D2BB             51                             SETB    PT1              ;Ìá¸ß¼ÆÊ±Æ÷TIMER1ÖÐ¶ÏµÄÓÅÏÈ¼¶£¬Ê¹ÆäÓÅÏÈÓÚI
+                             NT0                  
+0039 C288             52                             CLR             IT0              ;INT0²ÉÓÃµÍµçÆ½´¥·¢
+003B C28A             53                             CLR             IT1              ;INT1²ÉÓÃµÍµçÆ½´¥·¢
+003D 758911           54                             MOV             TMOD,#MODE      ;ÉèÖÃ¶¨Ê±Æ÷Ä£Ê½
+0040 D200             55                             SETB    NOT_TWINKLE
+0042 758C3C           56                             MOV             TH0,#3CH        ;65535-50000 = 3CAFH£¬¾§Õñ6MHzÊ±£¬¶
+                             ¨Ê±Æ÷Ã¿´Î¶¨Ê±0.1s
+A51 MACRO ASSEMBLER  TASK2                                                                06/13/2017 12:46:01 PAGE     2
 
-0065 C2A8             58     RESET:          CLR             EX0
-0067 314E             59                             ACALL   DELAY
-0069 208948           60                             JB              IE0,RESET_EXIT
-006C C28C             61                             CLR             TR0                      ;¹Ø±ÕTIMER0
-006E D28E             62                             SETB    TR1                      ;´ò¿ªTIMER1
-0070 D2AA             63                             SETB    EX1              ;´ò¿ªÖÐ¶ÏINT1µÄ¿ª¹Ø
-0072 752100           64                             MOV             MINH,#0
-0075 752200           65                             MOV             MINL,#0
-0078 752300           66                             MOV             SECH,#0
-007B 752400           67                             MOV             SECL,#0
-007E 3162             68     SCAN1:          ACALL   SCAN
-0080 BCFF02           69                             CJNE    R4,#0FFH,NEXT1
-0083 80F9             70                             SJMP    SCAN1
-0085 EC               71     NEXT1:          MOV             A,R4
-0086 C3               72                             CLR             C
-0087 9406             73                             SUBB    A,#6
-0089 50F3             74                             JNC             SCAN1
-008B 8C21             75                             MOV             MINH,R4
-                      76     
-008D 3157             77                             ACALL   SCAN_DELAY
-                      78     
-008F 3162             79     SCAN2:          ACALL   SCAN
-0091 BCFF02           80                             CJNE    R4,#0FFH,NEXT2
-0094 80F9             81                             SJMP    SCAN2
-0096 8C22             82     NEXT2:          MOV             MINL,R4
-                      83     
-0098 3157             84                             ACALL   SCAN_DELAY
-                      85     
-009A 3162             86     SCAN3:          ACALL   SCAN
-009C BCFF02           87                             CJNE    R4,#0FFH,NEXT3
-009F 80F9             88                             SJMP    SCAN3
-00A1 EC               89     NEXT3:          MOV             A,R4
-00A2 C3               90                             CLR             C
-00A3 9406             91                             SUBB    A,#6
-00A5 50F3             92                             JNC             SCAN3
-00A7 8C23             93                             MOV             SECH,R4
-                      94     
-00A9 3157             95                             ACALL   SCAN_DELAY
-                      96     
-00AB 3162             97     SCAN4:          ACALL   SCAN
-00AD BCFF02           98                             CJNE    R4,#0FFH,NEXT4
-00B0 80F9             99                             SJMP    SCAN4
-00B2 8C24            100     NEXT4:          MOV             SECL,R4                                 
-00B4 C28E            101     RESET_EXIT:     CLR             TR1                      ;¹Ø±ÕTIMER1
-00B6 C200            102                             CLR             NOT_TWINKLE     
-00B8 D28C            103                             SETB    TR0
-00BA D2A8            104                             SETB    EX0
-00BC 32              105                             RETI
-                     106     
-                     107     
+0045 758AAF           57                             MOV             TL0,#0AFH
+0048 758DB1           58                             MOV             TH1,#0B1H       ;65535-20000 = B1DFH£¬¾§Õñ6MHzÊ±£¬¶
+                             ¨Ê±Æ÷Ã¿´Î¶¨Ê±0.04s
+004B 758BDF           59                             MOV             TL1,#0DFH
+004E 7B0A             60                             MOV             R3,#TIMES       ;¿ØÖÆ¶¨Ê±Æ÷TIMER0Ñ­»·´ÎÊ
+0050 7D0A             61                             MOV             R5,#TIMES       ;¿ØÖÆ¶¨Ê±Æ÷TIMER1Ñ­»·´ÎÊ
+0052 758130           62                             MOV             SP,#30H         ;ÒÆ¿ª¶ÑÕ»Ö¸Õë±ÜÃâ³åÍ»
+0055 11FA             63     MAIN_LOOP:      ACALL   DISPLAY         ;ÊÂë¹ÜÏÔÊ¾                      
+0057 0155             64                             AJMP    MAIN_LOOP
+                      65     
+                      66     
+                      67     
+                      68     
+                      69     ;=================================================
+                      70     ;INT0ÖÐ¶Ïº¯Ê£ºRESET
+                      71     ;¹¦ÄÜ£ºÓÉÓÃ»§Í¨¹¾ØÕó¼üÅÌÉèÖÃµ¹¼ÆÊ±Ê±³¤
+                      72     ;          ¿ÉÉèÖÃÊ±³¤Çø¼äÎª00£»00-59£º59
+                      73     ;          Èô²»ÔÚ´ËÇø¼äÄÚÔòÊäÈëÎÞÐ§
+                      74     ;          ÉèÖÃÎ´Íê³ÉÇ°ÊÂë¹Ü´¦ÓÚÉÁË¸×´Ì¬
+                      75     ;=================================================
+0059 C2A8             76     RESET:          CLR             EX0                      ;¹Ø±ÕÖÐ¶ÏINT0,·ÀÖ¹¶à´ÎÖÐ¶Ï
+005B 316B             77                             ACALL   DELAY            ;°´¼üÏû¶¶
+005D C28C             78                             CLR             TR0                      ;¹Ø±ÕTIMER0£¬µ¹¼ÆÊ±ÔÝÍ£
+005F D28E             79                             SETB    TR1                      ;´ò¿ªTIMER1£¬ÊÂë¹ÜÉÁË¸
+0061 D2AA             80                             SETB    EX1                      ;´ò¿ªÖÐ¶ÏINT1µÄ¿ª¹Ø
+0063 20895A           81                             JB              IE0,RESET_EXIT
+0066 752100           82                             MOV             MINH,#0          ;³õÊ¼»¯µ¹¼ÆÊ±Æ÷
+0069 752200           83                             MOV             MINL,#0
+006C 752300           84                             MOV             SECH,#0
+006F 752400           85                             MOV             SECL,#0
+                      86     
+0072 A200             87     SCAN1:          MOV             C,NOT_TWINKLE
+0074 9201             88                             MOV             STOP_1,C
+0076 317F             89                             ACALL   SCAN             ;É¨ÃèµÚÒ»´Î¼üÅÌÊäÈë
+0078 BCFF02           90                             CJNE    R4,#0FFH,NEXT1;Èç¹ûR4! = 0FFH£¬ÔòÓÐÊäÈë£¬Ìø×ªÏÂÒ»²½
+007B 80F5             91                             SJMP    SCAN1            ;Ã»ÓÐÊäÈëÖØÐÂÉ¨Ãè
+007D EC               92     NEXT1:          MOV             A,R4             ;·ÖÖÓµÚÒ»Î»ÒªÐ¡ÓÚ6
+007E C3               93                             CLR             C
+007F 9406             94                             SUBB    A,#6
+0081 50EF             95                             JNC             SCAN1            ;³¬¹5ÖØÐÂÉ¨Ãè
+0083 8C21             96                             MOV             MINH,R4
+0085 C201             97                             CLR             STOP_1
+                      98     
+0087 3174             99                             ACALL   SCAN_DELAY       ;Á½´ÎÉ¨ÃèÖ®¼äÒªÑÓÊ±
+                     100     
+0089 A200            101     SCAN2:          MOV             C,NOT_TWINKLE
+008B 9202            102                             MOV             STOP_2,C
+008D 317F            103                             ACALL   SCAN
+008F BCFF02          104                             CJNE    R4,#0FFH,NEXT2
+0092 80F5            105                             SJMP    SCAN2
+0094 8C22            106     NEXT2:          MOV             MINL,R4
+0096 C202            107                             CLR             STOP_2
                      108     
-                     109     
-00BD DB04            110     TIMER0:         DJNZ    R3,TIMER0_AGAIN
-00BF 3114            111                             ACALL   DECREASE
-00C1 7B0A            112                             MOV             R3,#TIMES
-00C3 758C3C          113     TIMER0_AGAIN:MOV        TH0,#3CH
-00C6 758AB0          114                             MOV             TL0,#0B0H
-00C9 D28C            115                             SETB    TR0
-00CB 32              116                             RETI
-                     117     
-00CC DD04            118     TIMER1:         DJNZ    R5,TIMER1_AGAIN
-00CE B200            119                             CPL             NOT_TWINKLE
-00D0 7D0A            120                             MOV             R5,#TIMES
-00D2 758D3C          121     TIMER1_AGAIN:MOV        TH1,#3CH
-00D5 758B0B          122                             MOV             TL1,#0BH
-00D8 D28E            123                             SETB    TR1
-A51 MACRO ASSEMBLER  TASK2                                                                06/12/2017 17:15:00 PAGE     3
+0098 3174            109                             ACALL   SCAN_DELAY
+                     110     
+009A A200            111     SCAN3:          MOV             C,NOT_TWINKLE
+009C 9203            112                             MOV             STOP_3,C
+009E 317F            113                             ACALL   SCAN
+00A0 BCFF02          114                             CJNE    R4,#0FFH,NEXT3
+00A3 80F5            115                             SJMP    SCAN3
+00A5 EC              116     NEXT3:          MOV             A,R4
+00A6 C3              117                             CLR             C
+00A7 9406            118                             SUBB    A,#6
+00A9 50EF            119                             JNC             SCAN3
+00AB 8C23            120                             MOV             SECH,R4
+00AD C203            121                             CLR             STOP_3
+A51 MACRO ASSEMBLER  TASK2                                                                06/13/2017 12:46:01 PAGE     3
 
-00DA 32              124                             RETI
-00DB 32              125                             RETI
-                     126     
-00DC 200005          127     TWINKLE:        JB              NOT_TWINKLE,TWINKLE_NEXT
-00DF 758000          128                             MOV             P0, #0
-00E2 01E6            129                             AJMP    TWINKLE_EXIT
-00E4 11E7            130     TWINKLE_NEXT:ACALL      DISPLAY                                 
-00E6 22              131     TWINKLE_EXIT:RET
-                     132                                                             
-00E7 758001          133     DISPLAY:        MOV             P0,#01H
-00EA E521            134                             MOV             A,MINH
-00EC 93              135                             MOVC    A,@A+DPTR
-00ED F8              136                             MOV             R0,A
-00EE 31C8            137                             ACALL   SHOW_NUM
-00F0 314E            138                             ACALL   DELAY
+                     122     
+00AF 3174            123                             ACALL   SCAN_DELAY
+                     124     
+00B1 A200            125     SCAN4:          MOV             C,NOT_TWINKLE
+00B3 9204            126                             MOV             STOP_4,C
+00B5 317F            127                             ACALL   SCAN
+00B7 BCFF02          128                             CJNE    R4,#0FFH,NEXT4
+00BA 80F5            129                             SJMP    SCAN4
+00BC 8C24            130     NEXT4:          MOV             SECL,R4
+00BE C204            131                             CLR             STOP_4
+                     132     
+00C0 C28E            133     RESET_EXIT:     CLR             TR1                      ;¹Ø±ÕTIMER1£¬Í£Ö¹ÉÁË¸
+00C2 D2A8            134                             SETB    EX0                      ;´ò¿ªINT0¿ª¹Ø
+00C4 32              135                             RETI
+                     136     
+                     137     
+                     138     
                      139     
-00F2 758002          140                             MOV             P0,#02H
-00F5 E522            141                             MOV             A,MINL
-00F7 93              142                             MOVC    A,@A+DPTR
-00F8 F8              143                             MOV             R0,A
-00F9 31C8            144                             ACALL   SHOW_NUM
-00FB 314E            145                             ACALL   DELAY
-                     146     
-00FD 758004          147                             MOV             P0,#04H
-0100 E523            148                             MOV             A,SECH
-0102 93              149                             MOVC    A,@A+DPTR
-0103 F8              150                             MOV             R0,A
-0104 31C8            151                             ACALL   SHOW_NUM
-0106 314E            152                             ACALL   DELAY
+                     140     ;=================================================
+                     141     ;INT1ÖÐ¶Ïº¯ÊSTART_OR_STOP
+                     142     ;¹¦ÄÜ£ºÔÝÍ£ºÍ¼ÌÐøµ¹¼ÆÊ±
+                     143     ;=================================================
+00C5                 144     START_OR_STOP:
+00C5 C2AA            145                             CLR             EX1
+00C7 316B            146                             ACALL   DELAY
+00C9 208B02          147                             JB              IE1,STOP_EXIT
+00CC B28C            148                             CPL             TR0             ;Í¨¹¿ªÆô/¹Ø±ÕTIMER0,ÊµÏÖÔÝÍ£ºÍ¼ÌÐøµ
+                             ¹¼ÆÊ±
+00CE D2AA            149     STOP_EXIT:      SETB    EX1
+00D0 32              150                             RETI
+                     151     
+                     152     
                      153     
-0108 758008          154                             MOV             P0,#08H
-010B E524            155                             MOV             A,SECL
-010D 93              156                             MOVC    A,@A+DPTR
-010E F8              157                             MOV             R0,A
-010F 31C8            158                             ACALL   SHOW_NUM
-0111 314E            159                             ACALL   DELAY
-0113 22              160                             RET                     
-                     161     
-0114 1524            162     DECREASE:       DEC             SECL
-0116 74FF            163                             MOV             A,#0FFH
-0118 B52432          164                             CJNE    A,SECL,DEC_EXIT
-011B 752409          165                             MOV             SECL,#9
+                     154     ;=================================================
+                     155     ;TIMER0ÖÐ¶Ïº¯ÊTIMER0
+                     156     ;¹¦ÄÜ£ºÃ¿10´Î¶¨Ê±Æ÷Òç³ö£¨1Ãë£©£¬µ¹¼ÆÊ±¼õÉÙÒ»Ãë
+                     157     ;=================================================
+00D1 DB04            158     TIMER0:         DJNZ    R3,TIMER0_AGAIN
+00D3 3133            159                             ACALL   DECREASE
+00D5 7B0A            160                             MOV             R3,#TIMES
+00D7 758C3C          161     TIMER0_AGAIN:MOV        TH0,#3CH
+00DA 758AAF          162                             MOV             TL0,#0AFH
+00DD D28C            163                             SETB    TR0
+00DF 32              164                             RETI
+                     165     
                      166     
-011E 1523            167                             DEC             SECH
-0120 74FF            168                             MOV             A,#0FFH
-0122 B52328          169                             CJNE    A,SECH,DEC_EXIT
-0125 752305          170                             MOV             SECH,#5
-                     171     
-0128 1522            172                             DEC             MINL
-012A 74FF            173                             MOV             A,#0FFH
-012C B5221E          174                             CJNE    A,MINL,DEC_EXIT
-012F 752209          175                             MOV             MINL,#9
-                     176     
-0132 1521            177                             DEC             MINH
-0134 74FF            178                             MOV             A,#0FFH
-0136 B52114          179                             CJNE    A,MINH,DEC_EXIT
-0139 752100          180                             MOV             MINH,#0
-013C 752200          181                             MOV             MINL,#0
-013F 752300          182                             MOV             SECH,#0
-0142 752400          183                             MOV             SECL,#0
-0145 C2AA            184                             CLR             EX1
-0147 C293            185                             CLR             P1.3
-0149 3157            186                             ACALL   SCAN_DELAY
-014B D293            187                             SETB    P1.3                                            
-014D 22              188     DEC_EXIT:       RET
-                     189                             
-A51 MACRO ASSEMBLER  TASK2                                                                06/12/2017 17:15:00 PAGE     4
+                     167     
+                     168     ;=================================================
+                     169     ;TIMER1ÖÐ¶Ïº¯ÊTIMER1
+                     170     ;¹¦ÄÜ£ºÃ¿10´Î¶¨Ê±Æ÷Òç³ö£¨0.4Ãë£©£¬¸Ä±äÊÇ·ñÉÁË¸±êÖ¾1´Î
+                     171     ;=================================================
+00E0 DD04            172     TIMER1:         DJNZ    R5,TIMER1_AGAIN
+00E2 B200            173                             CPL             NOT_TWINKLE
+00E4 7D0A            174                             MOV             R5,#TIMES
+00E6 758DB1          175     TIMER1_AGAIN:MOV        TH1,#0B1H
+00E9 758BDF          176                             MOV             TL1,#0DFH
+00EC D28E            177                             SETB    TR1
+00EE 32              178                             RETI
+                     179     
+                     180     
+                     181     
+                     182     ;=================================================
+                     183     ;TWINKLE
+                     184     ;¹¦ÄÜ£ºÍ¨¹ÅÐ¶ÏÉÁË¸±êÖ¾ÊµÏÖÊÂë¹ÜÉÁË¸
+                     185     ;=================================================
+00EF 200005          186     TWINKLE:        JB              NOT_TWINKLE,TWINKLE_NEXT
+A51 MACRO ASSEMBLER  TASK2                                                                06/13/2017 12:46:01 PAGE     4
 
-                     190     
-014E 7FC8            191     DELAY:          MOV     R7, #200                ;Ô¼2ms   
-0150 7E1E            192     DL1:            MOV     R6, #30
-0152 DEFE            193                             DJNZ    R6, $           
-0154 DFFA            194                             DJNZ    R7, DL1
-0156 22              195                     RET
-                     196     
-0157 752528          197     SCAN_DELAY: MOV         COUNT,#40
-015A 314E            198     DL2:            ACALL   DELAY
-015C 11DC            199                             ACALL   TWINKLE
-015E D525F9          200                             DJNZ    COUNT,DL2
-0161 22              201                             RET 
-                     202     
-0162 7CFF            203     SCAN:           MOV             R4,#0FFH
-0164 11DC            204                             ACALL   TWINKLE
-0166 75A00F          205                             MOV             P2,#0FH
-0169 E5A0            206                             MOV             A,P2
-016B B40F02          207                             CJNE    A,#0FH, SCAN_SHAKE
-016E 21C7            208                             AJMP    SCAN_EXIT
-0170 314E            209     SCAN_SHAKE:     ACALL   DELAY
-0172 E5A0            210                             MOV             A,P2
-0174 B40F02          211                             CJNE    A,#0FH, SCAN_ROW
-0177 21C7            212                             AJMP    SCAN_EXIT
-0179 ACA0            213     SCAN_ROW:       MOV             R4,P2
-017B 75A0F0          214                             MOV             P2,#0F0H
-017E E5A0            215                             MOV             A,P2
-0180 4C              216                             ORL             A,R4
-0181 7CFF            217                             MOV             R4,#0FFH
-0183 B4EE04          218                             CJNE    A,#11101110B,N1
-0186 7C00            219                             MOV             R4,#0
-0188 21C7            220                             AJMP    SCAN_EXIT
-018A B4DE04          221     N1:                     CJNE    A,#11011110B,N2
-018D 7C01            222                             MOV             R4,#1
-018F 21C7            223                             AJMP    SCAN_EXIT
-0191 B4BE04          224     N2:                     CJNE    A,#10111110B,N3
-0194 7C02            225                             MOV             R4,#2
-0196 21C7            226                             AJMP    SCAN_EXIT
-0198 B47E04          227     N3:                     CJNE    A,#01111110B,N4
-019B 7C03            228                             MOV             R4,#3
-019D 21C7            229                             AJMP    SCAN_EXIT
-019F B4ED04          230     N4:                     CJNE    A,#11101101B,N5
-01A2 7C04            231                             MOV             R4,#4
-01A4 21C7            232                             AJMP    SCAN_EXIT
-01A6 B4DD04          233     N5:                     CJNE    A,#11011101B,N6
-01A9 7C05            234                             MOV             R4,#5
-01AB 21C7            235                             AJMP    SCAN_EXIT
-01AD B4BD04          236     N6:                     CJNE    A,#10111101B,N7
-01B0 7C06            237                             MOV             R4,#6
-01B2 21C7            238                             AJMP    SCAN_EXIT
-01B4 B47D04          239     N7:                     CJNE    A,#01111101B,N8
-01B7 7C07            240                             MOV             R4,#7
-01B9 21C7            241                             AJMP    SCAN_EXIT
-01BB B4EB04          242     N8:                     CJNE    A,#11101011B,N9
-01BE 7C08            243                             MOV             R4,#8
-01C0 21C7            244                             AJMP    SCAN_EXIT
-01C2 B4DB02          245     N9:                     CJNE    A,#11011011B,SCAN_EXIT
-01C5 7C09            246                             MOV             R4,#9   
-01C7 22              247     SCAN_EXIT:      RET
-                     248                                     
-                     249              ;INPUT PARAMETER:R0
-01C8 7908            250     SHOW_NUM:       MOV     R1, #8H;
-01CA 7401            251                             MOV     A, #00000001B           
-01CC FA              252                             MOV     R2,A             
-01CD 58              253     SHIFT:          ANL     A,R0                    ;pick out one bit,from right to left
-01CE 7011            254                             JNZ     SET_DAT
-01D0 C287            255                             CLR     DAT
-A51 MACRO ASSEMBLER  TASK2                                                                06/12/2017 17:15:00 PAGE     5
+00F2 758000          187                             MOV             P0, #0            ;ÊÂë¹Ü²»ÏÔÊ¾
+00F5 01F9            188                             AJMP    TWINKLE_EXIT
+00F7 11FA            189     TWINKLE_NEXT:ACALL      DISPLAY           ;ÊÂë¹ÜÏÔÊ¾                    
+00F9 22              190     TWINKLE_EXIT:RET
+                     191     
+                     192     
+                     193     ;=================================================
+                     194     ;DISPLAY
+                     195     ;¹¦ÄÜ£ºÊÂë¹ÜÏÔÊ¾
+                     196     ;=================================================                                         
+                                          
+00FA 20010B          197     DISPLAY:        JB              STOP_1,DISP_NEXT1
+00FD 758001          198                             MOV             P0,#01H          ;¿ªÆôµÚÒ»¸öÊÂë¹Ü
+0100 E521            199                             MOV             A,MINH
+0102 93              200                             MOVC    A,@A+DPTR        ;²é±í»ñµÃËùÒªÏÔÊ¾Ê×ÖµÄ±àÂë
+0103 F8              201                             MOV             R0,A
+0104 31E5            202                             ACALL   SHOW_NUM         ;ÏÔÊ¾Ê×Ö
+0106 316B            203                             ACALL   DELAY            ;ÑÓÊ±Ò»¶ÎÊ±¼ä£¬ÊÓ¾õÔÝÁô
+                     204     
+0108 20020B          205     DISP_NEXT1:     JB              STOP_2,DISP_NEXT2
+010B 758002          206                             MOV             P0,#02H
+010E E522            207                             MOV             A,MINL
+0110 93              208                             MOVC    A,@A+DPTR
+0111 F8              209                             MOV             R0,A
+0112 31E5            210                             ACALL   SHOW_NUM
+0114 316B            211                             ACALL   DELAY
+                     212     
+0116 20030B          213     DISP_NEXT2:     JB              STOP_3,DISP_NEXT3
+0119 758004          214                             MOV             P0,#04H
+011C E523            215                             MOV             A,SECH
+011E 93              216                             MOVC    A,@A+DPTR
+011F F8              217                             MOV             R0,A
+0120 31E5            218                             ACALL   SHOW_NUM
+0122 316B            219                             ACALL   DELAY
+                     220     
+0124 20040B          221     DISP_NEXT3:     JB              STOP_4,DISP_EXIT
+0127 758008          222                             MOV             P0,#08H
+012A E524            223                             MOV             A,SECL
+012C 93              224                             MOVC    A,@A+DPTR
+012D F8              225                             MOV             R0,A
+012E 31E5            226                             ACALL   SHOW_NUM
+0130 316B            227                             ACALL   DELAY
+0132 22              228     DISP_EXIT:      RET     
+                     229                                                                     
+                     230     ;=================================================
+                     231     ;DECREASE
+                     232     ;¹¦ÄÜ£ºµ¹¼ÆÊ±¼õÉÙ1Ãë
+                     233     ;          Èç¹ûµ¹¼ÆÊ±Íê³É±£³Ö00£º00,·äÃùÆ÷·¢Éù   
+                     234     ;=================================================
+0133 1524            235     DECREASE:       DEC             SECL
+0135 74FF            236                             MOV             A,#0FFH
+0137 B52430          237                             CJNE    A,SECL,DEC_EXIT
+013A 752409          238                             MOV             SECL,#9
+                     239     
+013D 1523            240                             DEC             SECH
+013F 74FF            241                             MOV             A,#0FFH
+0141 B52326          242                             CJNE    A,SECH,DEC_EXIT
+0144 752305          243                             MOV             SECH,#5
+                     244     
+0147 1522            245                             DEC             MINL
+0149 74FF            246                             MOV             A,#0FFH
+014B B5221C          247                             CJNE    A,MINL,DEC_EXIT
+014E 752209          248                             MOV             MINL,#9
+                     249     
+0151 1521            250                             DEC             MINH
+0153 74FF            251                             MOV             A,#0FFH
+A51 MACRO ASSEMBLER  TASK2                                                                06/13/2017 12:46:01 PAGE     5
 
-01D2 D284            256     SET_SCK:        SETB    SCK
-01D4 C284            257                             CLR     SCK      
-01D6 EA              258                             MOV     A,R2
-01D7 23              259                             RL              A
-01D8 FA              260                             MOV     R2,A
-01D9 D9F2            261                             DJNZ    R1,SHIFT                         
-01DB D285            262                             SETB    RCK
-01DD C285            263                             CLR     RCK
-01DF 21E5            264                             AJMP    SHOW_EXIT
-01E1 D287            265     SET_DAT:        SETB    DAT     
-01E3 21D2            266                             AJMP    SET_SCK
-01E5 22              267     SHOW_EXIT:      RET
-                     268     
-01E6 FC60DAF2        269     TAB:            DB              0fcH,60H,0daH,0f2H,66H,0b6H,0beH,0e0H,0feH,0f6H         
-01EA 66B6BEE0                
-01EE FEF6                    
-                     270                             
-                     271                             END
-A51 MACRO ASSEMBLER  TASK2                                                                06/12/2017 17:15:00 PAGE     6
+0155 B52112          252                             CJNE    A,MINH,DEC_EXIT
+                     253     
+                     254                             ;´ËÊ±µ¹¼ÆÊ±Íê³É£¬±£³Ö00£º00£¬·äÃùÆ÷·¢Éù
+0158 752100          255                             MOV             MINH,#0
+015B 752200          256                             MOV             MINL,#0
+015E 752300          257                             MOV             SECH,#0
+0161 752400          258                             MOV             SECL,#0
+                     259     ;                       CLR             EX1                ;µ¹¼ÆÊ±ÒÑÍê³É£¬¹Ê¹Ø±ÕINT1µÄµ¹¼ÆÊ
+                             ±ÔÝÍ£¹¦ÄÜ
+0164 C293            260                             CLR             P1.3       ;·äÃùÆ÷·¢Éù                  
+0166 3174            261                             ACALL   SCAN_DELAY        
+0168 D293            262                             SETB    P1.3       ;·äÃùÆ÷¹Ø±Õ
+                     263                                                                             
+016A 22              264     DEC_EXIT:       RET
+                     265     
+                     266                             
+                     267     ;=================================================
+                     268     ;DELAY
+                     269     ;¹¦ÄÜ£ºÑÓÊ±12ms
+                     270     ;=================================================
+016B 7FC8            271     DELAY:          MOV     R7, #200                ;Ô¼12ms   
+016D 7E1E            272     DL1:            MOV     R6, #30
+016F DEFE            273                             DJNZ    R6, $           
+0171 DFFA            274                             DJNZ    R7, DL1
+0173 22              275                     RET
+                     276     
+                     277     
+                     278     ;=================================================
+                     279     ;SCAN_DELAY
+                     280     ;¹¦ÄÜ£ºÑÓÊ±0.25s£¬ÇÒ±£³ÖÊÂë¹ÜÏÔÊ¾
+                     281     ;=================================================
+0174 752514          282     SCAN_DELAY: MOV         COUNT,#20               ;Ô¼0.25s
+0177 316B            283     DL2:            ACALL   DELAY
+0179 11FA            284                             ACALL   DISPLAY
+017B D525F9          285                             DJNZ    COUNT,DL2
+017E 22              286                             RET 
+                     287     
+                     288     ;=================================================
+                     289     ;SCAN
+                     290     ;¹¦ÄÜ£º¼üÅÌÉ¨Ãè£¬É¨Ãè½á¹û´¢´æÔÚR4ÖÐ
+                     291     ;Ã»ÓÐ°´¼ü°´ÏÂ£¬»òËù°´°´¼üÎªA-F£¬R4Îª0FFH
+                     292     ;Ëù°´°´¼üÎª0-9£¬R4Îª0-9
+                     293     ;=================================================
+017F 7CFF            294     SCAN:           MOV             R4,#0FFH
+0181 11FA            295                             ACALL   DISPLAY                          ;É¨Ãè¹³Ì±£³ÖÉÁË¸
+0183 75A00F          296                             MOV             P2,#0FH                          ;ÏÈ½øÐÐÁÐÉ¨Ãè
+0186 E5A0            297                             MOV             A,P2
+0188 B40F02          298                             CJNE    A,#0FH, SCAN_SHAKE       ;Èç¹ûP2!=0FH,ÔòÓÐ°´¼ü±»°´ÏÂ£¬Ìø×ª½
+                             øÐÐÏû¶¶
+018B 21E4            299                             AJMP    SCAN_EXIT                        ;Ã»ÓÐ°´¼ü°´ÏÂ£¬ÍË³öÖØÐÂÉ¨Ã
+                             è
+018D 316B            300     SCAN_SHAKE:     ACALL   DELAY
+018F E5A0            301                             MOV             A,P2
+0191 B40F02          302                             CJNE    A,#0FH, SCAN_ROW         ;Ïû¶¶È·ÈÏÓÐ°´¼ü°´ÏÂ£¬½øÐÐÐÐÉ¨Ãè
+0194 21E4            303                             AJMP    SCAN_EXIT
+0196 ACA0            304     SCAN_ROW:       MOV             R4,P2
+0198 75A0F0          305                             MOV             P2,#0F0H
+019B E5A0            306                             MOV             A,P2
+019D 4C              307                             ORL             A,R4                             ;½«ÐÐÁÐÉ¨Ãè½á¹û½øÐ
+                             ÐÂß¼­¡°»ò¡±ÔËËã
+019E 7CFF            308                             MOV             R4,#0FFH
+01A0 B4E704          309                             CJNE    A,#11100111B,N1          ;¸ù¾Ý½á¹ûÅÐ¶ÏÊÇÄÄ¸ö°´¼ü°´ÏÂ
+01A3 7C00            310                             MOV             R4,#0
+01A5 21E4            311                             AJMP    SCAN_EXIT
+01A7 B4EB04          312     N1:                     CJNE    A,#11101011B,N2
+01AA 7C01            313                             MOV             R4,#1
+A51 MACRO ASSEMBLER  TASK2                                                                06/13/2017 12:46:01 PAGE     6
+
+01AC 21E4            314                             AJMP    SCAN_EXIT
+01AE B4ED04          315     N2:                     CJNE    A,#11101101B,N3
+01B1 7C02            316                             MOV             R4,#2
+01B3 21E4            317                             AJMP    SCAN_EXIT
+01B5 B4EE04          318     N3:                     CJNE    A,#11101110B,N4
+01B8 7C03            319                             MOV             R4,#3
+01BA 21E4            320                             AJMP    SCAN_EXIT
+01BC B4D704          321     N4:                     CJNE    A,#11010111B,N5
+01BF 7C04            322                             MOV             R4,#4
+01C1 21E4            323                             AJMP    SCAN_EXIT
+01C3 B4DB04          324     N5:                     CJNE    A,#11011011B,N6
+01C6 7C05            325                             MOV             R4,#5
+01C8 21E4            326                             AJMP    SCAN_EXIT
+01CA B4DD04          327     N6:                     CJNE    A,#11011101B,N7
+01CD 7C06            328                             MOV             R4,#6
+01CF 21E4            329                             AJMP    SCAN_EXIT
+01D1 B4DE04          330     N7:                     CJNE    A,#11011110B,N8
+01D4 7C07            331                             MOV             R4,#7
+01D6 21E4            332                             AJMP    SCAN_EXIT
+01D8 B4B704          333     N8:                     CJNE    A,#10110111B,N9
+01DB 7C08            334                             MOV             R4,#8
+01DD 21E4            335                             AJMP    SCAN_EXIT
+01DF B4BB02          336     N9:                     CJNE    A,#10111011B,SCAN_EXIT
+01E2 7C09            337                             MOV             R4,#9   
+01E4 22              338     SCAN_EXIT:      RET
+                     339     
+                     340     
+                     341     ;=================================================
+                     342     ;SHOW_NUM
+                     343     ;¹¦ÄÜ£ºÊÂë¹ÜÏÔÊ¾Ò»¸öÊ×Ö
+                     344     ;ÊäÈë²ÎÊR0ÎªÒªÏÔÊ¾Ê×ÖµÄÊÂë¹Ü±àÂë
+                     345     ;=================================================                              
+01E5 7908            346     SHOW_NUM:       MOV     R1, #8H;
+01E7 7401            347                             MOV     A, #00000001B           
+01E9 FA              348                             MOV     R2,A             
+01EA 58              349     SHIFT:          ANL     A,R0                    ;½«Ê¾ÝÖðÎ»´«ÖÁDAT½Å
+01EB 7004            350                             JNZ     SET_DAT
+01ED C287            351                             CLR     DAT
+01EF 21F3            352                             AJMP    SET_SCK
+01F1 D287            353     SET_DAT:        SETB    DAT     
+01F3 D284            354     SET_SCK:        SETB    SCK                             ;SCK²úÉúÒ»ÉÏÉÑØ£¬½«DATÉÏµÄÊ¾ÝÒÆÈë74
+                             HC595ÒÆÎ»¼Ä´æÆ÷ÖÐ£¬ÏÈËÍµÍÎ»£¬ºóËÍ¸ßÎ»
+01F5 C284            355                             CLR     SCK      
+01F7 EA              356                             MOV     A,R2
+01F8 23              357                             RL              A
+01F9 FA              358                             MOV     R2,A
+01FA D9EE            359                             DJNZ    R1,SHIFT                         
+01FC D285            360                             SETB    RCK                             ;½«ÓÉDATÉÏÒÑÒÆÈëÊ¾Ý¼Ä´æÆ÷ÖÐ
+                             µÄÊ¾ÝËÍÈëµ½Êä³öËø´æÆ÷,ÊµÏÖ²¢ÐÐÊä³ö
+01FE C285            361                             CLR     RCK
+0200 22              362     SHOW_EXIT:      RET
+                     363     
+                     364     
+                     365     ;=================================================
+                     366     ;ÊÂë¹Ü±àÂë±í
+                     367     ;=================================================
+0201 FC60DAF2        368     TAB:            DB              0fcH,60H,0daH,0f2H,66H,0b6H,0beH,0e0H,0feH,0f6H         
+0205 66B6BEE0                
+0209 FEF6                    
+                     369                             
+                     370                             END
+A51 MACRO ASSEMBLER  TASK2                                                                06/13/2017 12:46:01 PAGE     7
 
 SYMBOL TABLE LISTING
 ------ ----- -------
@@ -299,12 +410,16 @@ N A M E             T Y P E  V A L U E   ATTRIBUTES
 
 COUNT. . . . . . .  N NUMB   0025H   A   
 DAT. . . . . . . .  B ADDR   0080H.7 A   
-DECREASE . . . . .  C ADDR   0114H   A   
-DEC_EXIT . . . . .  C ADDR   014DH   A   
-DELAY. . . . . . .  C ADDR   014EH   A   
-DISPLAY. . . . . .  C ADDR   00E7H   A   
-DL1. . . . . . . .  C ADDR   0150H   A   
-DL2. . . . . . . .  C ADDR   015AH   A   
+DECREASE . . . . .  C ADDR   0133H   A   
+DEC_EXIT . . . . .  C ADDR   016AH   A   
+DELAY. . . . . . .  C ADDR   016BH   A   
+DISPLAY. . . . . .  C ADDR   00FAH   A   
+DISP_EXIT. . . . .  C ADDR   0132H   A   
+DISP_NEXT1 . . . .  C ADDR   0108H   A   
+DISP_NEXT2 . . . .  C ADDR   0116H   A   
+DISP_NEXT3 . . . .  C ADDR   0124H   A   
+DL1. . . . . . . .  C ADDR   016DH   A   
+DL2. . . . . . . .  C ADDR   0177H   A   
 EA . . . . . . . .  B ADDR   00A8H.7 A   
 ET0. . . . . . . .  B ADDR   00A8H.1 A   
 ET1. . . . . . . .  B ADDR   00A8H.3 A   
@@ -317,68 +432,72 @@ IT1. . . . . . . .  B ADDR   0088H.2 A
 MAIN_LOOP. . . . .  C ADDR   0055H   A   
 MINH . . . . . . .  N NUMB   0021H   A   
 MINL . . . . . . .  N NUMB   0022H   A   
-MODE . . . . . . .  N NUMB   0001H   A   
-N1 . . . . . . . .  C ADDR   018AH   A   
-N2 . . . . . . . .  C ADDR   0191H   A   
-N3 . . . . . . . .  C ADDR   0198H   A   
-N4 . . . . . . . .  C ADDR   019FH   A   
-N5 . . . . . . . .  C ADDR   01A6H   A   
-N6 . . . . . . . .  C ADDR   01ADH   A   
-N7 . . . . . . . .  C ADDR   01B4H   A   
-N8 . . . . . . . .  C ADDR   01BBH   A   
-N9 . . . . . . . .  C ADDR   01C2H   A   
-NEXT1. . . . . . .  C ADDR   0085H   A   
-NEXT2. . . . . . .  C ADDR   0096H   A   
-NEXT3. . . . . . .  C ADDR   00A1H   A   
-NEXT4. . . . . . .  C ADDR   00B2H   A   
+MODE . . . . . . .  N NUMB   0011H   A   
+N1 . . . . . . . .  C ADDR   01A7H   A   
+N2 . . . . . . . .  C ADDR   01AEH   A   
+N3 . . . . . . . .  C ADDR   01B5H   A   
+N4 . . . . . . . .  C ADDR   01BCH   A   
+N5 . . . . . . . .  C ADDR   01C3H   A   
+N6 . . . . . . . .  C ADDR   01CAH   A   
+N7 . . . . . . . .  C ADDR   01D1H   A   
+N8 . . . . . . . .  C ADDR   01D8H   A   
+N9 . . . . . . . .  C ADDR   01DFH   A   
+NEXT1. . . . . . .  C ADDR   007DH   A   
+NEXT2. . . . . . .  C ADDR   0094H   A   
+NEXT3. . . . . . .  C ADDR   00A5H   A   
+NEXT4. . . . . . .  C ADDR   00BCH   A   
 NOT_TWINKLE. . . .  B ADDR   0020H.0 A   
 P0 . . . . . . . .  D ADDR   0080H   A   
 P1 . . . . . . . .  D ADDR   0090H   A   
 P2 . . . . . . . .  D ADDR   00A0H   A   
 PT1. . . . . . . .  B ADDR   00B8H.3 A   
 RCK. . . . . . . .  B ADDR   0080H.5 A   
-RESET. . . . . . .  C ADDR   0065H   A   
-RESET_EXIT . . . .  C ADDR   00B4H   A   
+RESET. . . . . . .  C ADDR   0059H   A   
+RESET_EXIT . . . .  C ADDR   00C0H   A   
 RST. . . . . . . .  B ADDR   0080H.6 A   
-SCAN . . . . . . .  C ADDR   0162H   A   
-SCAN1. . . . . . .  C ADDR   007EH   A   
-SCAN2. . . . . . .  C ADDR   008FH   A   
+SCAN . . . . . . .  C ADDR   017FH   A   
+SCAN1. . . . . . .  C ADDR   0072H   A   
+SCAN2. . . . . . .  C ADDR   0089H   A   
 SCAN3. . . . . . .  C ADDR   009AH   A   
-SCAN4. . . . . . .  C ADDR   00ABH   A   
-SCAN_DELAY . . . .  C ADDR   0157H   A   
-SCAN_EXIT. . . . .  C ADDR   01C7H   A   
-SCAN_ROW . . . . .  C ADDR   0179H   A   
-SCAN_SHAKE . . . .  C ADDR   0170H   A   
+SCAN4. . . . . . .  C ADDR   00B1H   A   
+SCAN_DELAY . . . .  C ADDR   0174H   A   
+SCAN_EXIT. . . . .  C ADDR   01E4H   A   
+SCAN_ROW . . . . .  C ADDR   0196H   A   
+SCAN_SHAKE . . . .  C ADDR   018DH   A   
 SCK. . . . . . . .  B ADDR   0080H.4 A   
 SECH . . . . . . .  N NUMB   0023H   A   
 SECL . . . . . . .  N NUMB   0024H   A   
-SET_DAT. . . . . .  C ADDR   01E1H   A   
-SET_SCK. . . . . .  C ADDR   01D2H   A   
-SHIFT. . . . . . .  C ADDR   01CDH   A   
-SHOW_EXIT. . . . .  C ADDR   01E5H   A   
-SHOW_NUM . . . . .  C ADDR   01C8H   A   
-A51 MACRO ASSEMBLER  TASK2                                                                06/12/2017 17:15:00 PAGE     7
+SET_DAT. . . . . .  C ADDR   01F1H   A   
+A51 MACRO ASSEMBLER  TASK2                                                                06/13/2017 12:46:01 PAGE     8
 
+SET_SCK. . . . . .  C ADDR   01F3H   A   
+SHIFT. . . . . . .  C ADDR   01EAH   A   
+SHOW_EXIT. . . . .  C ADDR   0200H   A   
+SHOW_NUM . . . . .  C ADDR   01E5H   A   
 SP . . . . . . . .  D ADDR   0081H   A   
 START. . . . . . .  C ADDR   001DH   A   
-START_OR_STOP. . .  C ADDR   0059H   A   
-STOP_EXIT. . . . .  C ADDR   0062H   A   
-TAB. . . . . . . .  C ADDR   01E6H   A   
+START_OR_STOP. . .  C ADDR   00C5H   A   
+STOP_1 . . . . . .  B ADDR   0020H.1 A   
+STOP_2 . . . . . .  B ADDR   0020H.2 A   
+STOP_3 . . . . . .  B ADDR   0020H.3 A   
+STOP_4 . . . . . .  B ADDR   0020H.4 A   
+STOP_EXIT. . . . .  C ADDR   00CEH   A   
+TAB. . . . . . . .  C ADDR   0201H   A   
 TH0. . . . . . . .  D ADDR   008CH   A   
 TH1. . . . . . . .  D ADDR   008DH   A   
-TIMER0 . . . . . .  C ADDR   00BDH   A   
-TIMER0_AGAIN . . .  C ADDR   00C3H   A   
-TIMER1 . . . . . .  C ADDR   00CCH   A   
-TIMER1_AGAIN . . .  C ADDR   00D2H   A   
+TIMER0 . . . . . .  C ADDR   00D1H   A   
+TIMER0_AGAIN . . .  C ADDR   00D7H   A   
+TIMER1 . . . . . .  C ADDR   00E0H   A   
+TIMER1_AGAIN . . .  C ADDR   00E6H   A   
 TIMES. . . . . . .  N NUMB   000AH   A   
 TL0. . . . . . . .  D ADDR   008AH   A   
 TL1. . . . . . . .  D ADDR   008BH   A   
 TMOD . . . . . . .  D ADDR   0089H   A   
 TR0. . . . . . . .  B ADDR   0088H.4 A   
 TR1. . . . . . . .  B ADDR   0088H.6 A   
-TWINKLE. . . . . .  C ADDR   00DCH   A   
-TWINKLE_EXIT . . .  C ADDR   00E6H   A   
-TWINKLE_NEXT . . .  C ADDR   00E4H   A   
+TWINKLE. . . . . .  C ADDR   00EFH   A   
+TWINKLE_EXIT . . .  C ADDR   00F9H   A   
+TWINKLE_NEXT . . .  C ADDR   00F7H   A   
 
 
 REGISTER BANK(S) USED: 0 
